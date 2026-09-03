@@ -1,4 +1,11 @@
 # 🎟️ Assignment 12: Event Management & Ticketing API with Firebase & Swagger
+
+---
+
+## 🌐 Live Production Deployment on Render
+- **Live Production URL:** [https://assignments12.onrender.com](https://assignments12.onrender.com)
+- **Swagger UI OpenAPI Docs:** [https://assignments12.onrender.com/api-docs](https://assignments12.onrender.com/api-docs)
+
 > **Track:** Backend Development | **Level:** Advanced | **Estimated Time:** 7–9 Hours  
 > **Tech Stack:** Node.js, Express.js, Firebase Firestore & Auth, express-rate-limit, swagger-ui-express, swagger-jsdoc, dotenv
 
