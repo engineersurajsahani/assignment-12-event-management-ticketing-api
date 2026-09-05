@@ -3,6 +3,8 @@
 > **Tech Stack:** Node.js, Express.js, Firebase Firestore & Auth, express-rate-limit, swagger-ui-express, swagger-jsdoc, dotenv
 
 ---
+### Live Link : https://assignment-12-event-management-ticketing.onrender.com/
+---
 
 ## 📌 1. Objective & Overview
 
