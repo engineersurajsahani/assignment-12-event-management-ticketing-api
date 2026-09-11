@@ -100,6 +100,7 @@ Swagger endpoint:
 
 ## Project Structure
 
+<pre>
 Pallavi_Sarovar_12/
 └── assignment-12-event-ticketing-api/
     ├── config/
@@ -124,6 +125,7 @@ Pallavi_Sarovar_12/
     ├── package.json
     ├── README.md
     └── server.js
+    </pre>
 
 ---
 
@@ -171,6 +173,7 @@ Swagger UI provides interactive documentation for authentication, events, and ti
 
 ## API Endpoints
 
+
 ### Authentication
 
 | Method | Endpoint | Access |
@@ -197,6 +200,7 @@ Swagger UI provides interactive documentation for authentication, events, and ti
 | POST | /api/tickets/book | Attendee |
 | GET | /api/tickets/my-tickets | Attendee |
 | POST | /api/tickets/:id/cancel | Ticket Owner |
+
 
 ---
 
