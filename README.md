@@ -1,224 +1,399 @@
-# 🎟️ Assignment 12: Event Management & Ticketing API with Firebase & Swagger
-> **Track:** Backend Development | **Level:** Advanced | **Estimated Time:** 7–9 Hours  
-> **Tech Stack:** Node.js, Express.js, Firebase Firestore & Auth, express-rate-limit, swagger-ui-express, swagger-jsdoc, dotenv
+# Event Management & Ticketing API
+
+A RESTful backend API for managing events and ticket bookings using Node.js, Express.js, Firebase Firestore, JWT authentication, and Swagger/OpenAPI.
+
+The application supports organizer and attendee roles, event management, ticket booking, ticket cancellation, Firestore transactions, rate limiting, and role-based access control.
 
 ---
 
-## 📌 1. Objective & Overview
+## Overview
 
-Develop a high-concurrency **Event Ticketing & Live Booking REST API** backed by **Google Firebase Firestore**, secured with **JWT Role-Based Access Control** (`Organizer` vs `Attendee`), hardened with **API Rate Limiting** to prevent ticket-scalping bots, and documented comprehensively with **Swagger OpenAPI 3.0**. Students will master Firestore atomic transactions (`runTransaction`) to guarantee that tickets are never oversold under concurrent traffic.
+The Event Management & Ticketing API provides a complete backend system for creating events and managing ticket bookings.
 
-### Key Learning Outcomes:
-- Implementing Firestore ACID transactions (`runTransaction`) for concurrent ticket decrements.
-- Configuring strict rate-limiting policies for booking routes to prevent bot spam and DDoS.
-- Generating OpenAPI 3.0 documentation using JSDoc tags and interactive Swagger UI.
-- Structuring multi-role authorization pipelines (`Organizer` creates events; `Attendee` purchases tickets).
-- Handling Firestore timestamp comparisons for upcoming vs completed events.
+The application has two main user roles:
 
----
+- Organizer
+- Attendee
 
-## 🛠️ 2. Tech Stack & Dependencies
+Organizers can create and manage their own events and view attendees.
 
-```bash
-# Initialize Node.js project
-npm init -y
+Attendees can browse events, book tickets, view their bookings, and cancel their tickets.
 
-# Install dependencies
-npm install express firebase-admin jsonwebtoken bcryptjs express-rate-limit swagger-ui-express swagger-jsdoc dotenv cors
-
-# Install development tools
-npm install -D nodemon
-```
+Firebase Firestore is used for database storage, while JWT is used for authentication and authorization.
 
 ---
 
-## 🗄️ 3. Firebase Firestore Document Schema
+## Features
 
-### 1. `events` Collection
-```json
-{
-  "id": "event_techconf_2026",
-  "title": "Global Cloud & AI Summit 2026",
-  "description": "Annual flagship backend conference",
-  "category": "Technology",
-  "eventDate": "2026-06-15T09:00:00Z",
-  "venue": "Bandra Kurla Complex, Mumbai",
-  "organizerId": "usr_organizer_01",
-  "ticketPrice": 1499,
-  "totalCapacity": 500,
-  "availableTickets": 482,
-  "createdAt": "2026-03-01T12:00:00Z"
-}
-```
+### Authentication
 
-### 2. `tickets` Collection
-```json
-{
-  "id": "ticket_rec_88219",
-  "eventId": "event_techconf_2026",
-  "eventTitle": "Global Cloud & AI Summit 2026",
-  "userId": "usr_attendee_99",
-  "attendeeName": "Kunal Sharma",
-  "attendeeEmail": "kunal@gmail.com",
-  "quantity": 2,
-  "totalPaid": 2998,
-  "bookingRef": "TKT-2026-88219",
-  "status": "confirmed", // "confirmed", "cancelled"
-  "bookedAt": "2026-03-02T16:20:00Z"
-}
-```
+- User registration
+- User login
+- JWT-based authentication
+- Password hashing using bcrypt
+- User profile endpoint
+- Role-based authorization
+
+### Event Management
+
+- Browse upcoming events
+- View event details
+- Filter events by category
+- Filter events by city
+- Create events
+- Update owned events
+- Delete owned events
+- View event attendees
+- Event capacity tracking
+- Upcoming event filtering
+
+### Ticket Management
+
+- Book event tickets
+- View personal tickets
+- Cancel booked tickets
+- Automatic ticket inventory restoration
+- Booking reference generation
+- Total payment calculation
+- Prevention of ticket overselling
+
+### Firestore Transactions
+
+Ticket booking uses a Firestore atomic transaction.
+
+The transaction checks ticket availability and updates the event inventory together. This prevents multiple simultaneous booking requests from selling more tickets than the available event capacity.
+
+### Rate Limiting
+
+The ticket booking endpoint is protected using express-rate-limit.
+
+Maximum allowed requests:
+
+10 requests per minute
+
+Requests exceeding the limit receive HTTP 429 Too Many Requests.
+
+### Swagger Documentation
+
+Swagger UI provides interactive API documentation and testing.
+
+Swagger endpoint:
+
+/api-docs
 
 ---
 
-## 📋 4. API Endpoints Specification
+## Technologies Used
 
-### 🔐 Authentication
+- Node.js
+- Express.js
+- Firebase Firestore
+- Firebase Admin SDK
+- JWT
+- bcrypt
+- Swagger / OpenAPI
+- express-rate-limit
+- dotenv
+- CORS
 
-| Method | Endpoint | Role Access | Description |
-|---|---|:---:|---|
-| `POST` | `/api/auth/register` | Public | Register as `Attendee` or `Organizer` |
-| `POST` | `/api/auth/login` | Public | Authenticate and obtain JWT token |
-| `GET` | `/api/auth/profile` | Authenticated | Retrieve user profile & role |
+---
 
-### 🎪 Event Management Endpoints
+## Project Structure
 
-| Method | Endpoint | Role Access | Description |
-|---|---|:---:|---|
-| `GET` | `/api/events` | Public | Browse all upcoming events (supports `?category=Technology&city=Mumbai`) |
-| `GET` | `/api/events/:id` | Public | View event details & live remaining ticket count |
-| `POST` | `/api/events` | **Organizer** | Create new event listing |
-| `PUT` | `/api/events/:id` | **Organizer** | Update event details (Organizer must own event) |
-| `DELETE` | `/api/events/:id` | **Organizer** | Cancel and delete event |
+Pallavi_Sarovar_12/
+└── assignment-12-event-ticketing-api/
+    ├── config/
+    │   ├── firebaseConfig.js
+    │   └── swagger.js
+    ├── controllers/
+    │   ├── authController.js
+    │   ├── eventController.js
+    │   └── ticketController.js
+    ├── docs/
+    │   └── API testing screenshots
+    ├── middleware/
+    │   ├── auth.js
+    │   ├── checkRole.js
+    │   └── rateLimiter.js
+    ├── routes/
+    │   ├── authRoutes.js
+    │   ├── eventRoutes.js
+    │   └── ticketRoutes.js
+    ├── .env.example
+    ├── .gitignore
+    ├── package.json
+    ├── README.md
+    └── server.js
 
-### 🎟️ Ticket Booking & Scalper Protection (Rate Limited)
+---
 
-| Method | Endpoint | Role Access | Description |
-|---|---|:---:|---|
-| `POST` | `/api/tickets/book` | **Attendee** | **Atomic Booking**: 10 requests / min limit. Decrements tickets via transaction |
-| `GET` | `/api/tickets/my-tickets` | **Attendee** | View purchased tickets |
-| `POST` | `/api/tickets/:id/cancel` | **Attendee** | Cancel ticket & restore ticket inventory |
-| `GET` | `/api/events/:id/attendees` | **Organizer** | List all registered attendees for the event |
+## Installation
 
-### 📚 Interactive Swagger Documentation
+### 1. Install Dependencies
 
-| Method | Endpoint | Description |
+Run the following command inside the project directory:
+
+npm install
+
+### 2. Configure Environment Variables
+
+Create a .env file using .env.example as a reference.
+
+The environment configuration includes the server port and JWT configuration.
+
+### 3. Configure Firebase
+
+Create a Firebase project and enable Cloud Firestore.
+
+Configure Firebase Admin SDK using the service account credentials.
+
+Firebase credentials must remain private and must not be committed to GitHub.
+
+### 4. Start the Server
+
+Run:
+
+npm start
+
+The API will start on the configured port.
+
+---
+
+## Swagger API Documentation
+
+After starting the server, open the following endpoint in your browser:
+
+/api-docs
+
+Swagger UI provides interactive documentation for authentication, events, and ticket-related endpoints.
+
+---
+
+## API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Access |
 |---|---|---|
-| `GET` | `/api-docs` | Full interactive Swagger UI documentation for all endpoints |
+| POST | /api/auth/register | Public |
+| POST | /api/auth/login | Public |
+| GET | /api/auth/profile | Authenticated |
+
+### Events
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | /api/events | Public |
+| GET | /api/events/:id | Public |
+| POST | /api/events | Organizer |
+| PUT | /api/events/:id | Event Owner |
+| DELETE | /api/events/:id | Event Owner |
+| GET | /api/events/:id/attendees | Event Owner |
+
+### Tickets
+
+| Method | Endpoint | Access |
+|---|---|---|
+| POST | /api/tickets/book | Attendee |
+| GET | /api/tickets/my-tickets | Attendee |
+| POST | /api/tickets/:id/cancel | Ticket Owner |
 
 ---
 
-## ⚡ 5. Firestore Concurrency Transaction Example
+## Ticket Booking Flow
 
-```javascript
-// controllers/ticketController.js
-const { db } = require('../config/firebaseConfig');
+1. The attendee logs in and receives a JWT token.
+2. The attendee sends a ticket booking request.
+3. The API verifies the authenticated user.
+4. The API checks whether the event exists.
+5. Available ticket capacity is checked.
+6. A Firestore transaction is started.
+7. The ticket booking is created.
+8. Available tickets are decreased.
+9. The transaction is committed.
+10. Booking details are returned to the attendee.
 
-exports.bookTicket = async (req, res, next) => {
-  const { eventId, quantity, attendeeName, attendeeEmail } = req.body;
-  const userId = req.user.id;
-  const qty = parseInt(quantity, 10);
-
-  const eventRef = db.collection('events').doc(eventId);
-  const ticketRef = db.collection('tickets').doc();
-
-  try {
-    const result = await db.runTransaction(async (t) => {
-      const eventDoc = await t.get(eventRef);
-      if (!eventDoc.exists) {
-        throw new Error('Event not found');
-      }
-
-      const eventData = eventDoc.data();
-      if (eventData.availableTickets < qty) {
-        throw new Error('Insufficient tickets available');
-      }
-
-      // 1. Decrement available tickets
-      t.update(eventRef, {
-        availableTickets: eventData.availableTickets - qty
-      });
-
-      // 2. Create ticket document
-      const bookingRef = `TKT-${Date.now().toString().slice(-6)}`;
-      const newTicket = {
-        id: ticketRef.id,
-        eventId,
-        eventTitle: eventData.title,
-        userId,
-        attendeeName,
-        attendeeEmail,
-        quantity: qty,
-        totalPaid: qty * eventData.ticketPrice,
-        bookingRef,
-        status: 'confirmed',
-        bookedAt: new Date().toISOString()
-      };
-
-      t.set(ticketRef, newTicket);
-      return newTicket;
-    });
-
-    res.status(201).json({ success: true, message: 'Tickets booked successfully', data: result });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
-```
+If insufficient tickets are available, the booking is rejected and the event inventory is not modified.
 
 ---
 
-## 🏗️ 6. Project Architecture
+## Ticket Cancellation
 
-```text
-assignment-12-event-ticketing-api/
-├── config/
-│   ├── firebaseConfig.js    # Firebase Admin Firestore init
-│   └── swagger.js           # Swagger specification config
-├── controllers/
-│   ├── authController.js
-│   ├── eventController.js
-│   └── ticketController.js  # Transactional booking logic
-├── middleware/
-│   ├── auth.js              # JWT verification
-│   ├── checkRole.js         # Organizer vs Attendee guard
-│   └── rateLimiter.js       # Strict booking rate limit
-├── routes/
-│   ├── authRoutes.js
-│   ├── eventRoutes.js
-│   └── ticketRoutes.js
-├── serviceAccountKey.json   # (In .gitignore)
-├── .env.example
-├── .gitignore
-├── package.json
-├── server.js
-└── README.md
-```
+When an attendee cancels a ticket:
+
+1. The ticket is verified.
+2. Ticket ownership is checked.
+3. The ticket status is updated.
+4. The cancelled quantity is restored to the event inventory.
+5. The update is performed using a Firestore transaction.
+
+This allows cancelled tickets to become available again.
 
 ---
 
-## 🧪 7. Testing & Verification
+## Role-Based Access Control
 
-1. Start server and visit `http://localhost:5000/api-docs` to view Swagger documentation.
-2. Register an organizer and create an event with `totalCapacity: 5`.
-3. Log in as an attendee and make concurrent booking calls; verify that `availableTickets` never drops below 0.
-4. Attempt more than 10 requests within 60 seconds on `/api/tickets/book`; verify `429 Too Many Requests` is returned.
+### Organizer
+
+Organizers can:
+
+- Create events
+- Update their own events
+- Delete their own events
+- View attendees for their own events
+
+### Attendee
+
+Attendees can:
+
+- Browse events
+- View event details
+- Book tickets
+- View their tickets
+- Cancel their own tickets
+
+Unauthorized roles are prevented from accessing restricted endpoints.
 
 ---
 
-## 📊 8. Grading Rubric (100 Marks)
+## Rate Limiting
 
-| Evaluation Component | Marks |
-|---|:---:|
-| **Firestore ACID Transactions (`runTransaction`) for Ticket Booking** | 25 |
-| **Role-Based Access Control (Organizer vs Attendee)** | 20 |
-| **Swagger / OpenAPI Documentation Completeness** | 20 |
-| **Rate Limiting Security Against Bot Abuse (`express-rate-limit`)** | 20 |
-| **Error Handling, Status Codes & Clean Code Architecture** | 15 |
-| **Total Marks** | **100** |
+The ticket booking endpoint is limited to 10 requests per minute.
+
+When the limit is exceeded, the API returns:
+
+HTTP 429 Too Many Requests
+
+This protects the booking system from excessive requests.
 
 ---
 
-## 📤 9. Submission Guidelines
+## Firestore Collections
 
-- Submit your GitHub repository: `itm-assignment-12-event-ticketing-api`.
-- Include screenshots of Swagger UI and Firestore collection records in `/docs`.
+### users
+
+Stores registered user information and roles.
+
+### events
+
+Stores event information, organizer information, pricing, capacity, location, date, and available tickets.
+
+### tickets
+
+Stores ticket bookings, quantities, payment information, booking references, status, and booking timestamps.
+
+---
+
+## Error Handling
+
+The API handles various error conditions including:
+
+- Invalid authentication
+- Missing authentication token
+- Invalid user roles
+- Unauthorized access
+- Invalid event IDs
+- Insufficient ticket availability
+- Invalid booking requests
+- Ticket ownership violations
+- Rate limit violations
+- Firebase/database errors
+
+Appropriate HTTP status codes are returned for successful and unsuccessful requests.
+
+---
+
+## Testing
+
+The API was tested using Swagger UI and Firebase Firestore.
+
+Testing includes:
+
+- User registration
+- User login
+- User profile
+- Event creation
+- Event retrieval
+- Attendee registration
+- Attendee login
+- Ticket booking
+- Multiple ticket bookings
+- Firestore inventory verification
+- Insufficient ticket validation
+- Ticket cancellation
+- Inventory restoration
+- My Tickets
+- Rate limiting
+- Organizer attendee list
+- Role-based access restrictions
+
+Screenshots of the API testing and Firestore results are available in the docs folder.
+
+---
+
+## Screenshots
+
+All assignment testing screenshots are stored in:
+
+docs/
+
+The screenshots demonstrate:
+
+- Swagger API testing
+- Authentication
+- Event creation
+- Ticket booking
+- Firestore records
+- Ticket availability validation
+- Rate limiting
+- Ticket cancellation
+- Inventory restoration
+- Role-based access control
+- Organizer attendee listing
+
+The screenshots are kept separately in the docs folder to keep the README clean and organized.
+
+---
+
+## Security
+
+Sensitive configuration files must not be committed to the repository.
+
+The following files and folders are excluded from version control:
+
+- .env
+- Firebase service account credentials
+- node_modules
+
+The repository contains .env.example as a safe configuration reference.
+
+---
+
+## Assignment Requirements
+
+| Requirement | Status |
+|---|---|
+| Authentication | Complete |
+| JWT Authorization | Complete |
+| Role-Based Access Control | Complete |
+| Event Management | Complete |
+| Ticket Booking | Complete |
+| Firestore Transactions | Complete |
+| Overselling Prevention | Complete |
+| Ticket Cancellation | Complete |
+| Inventory Restoration | Complete |
+| Booking Rate Limiting | Complete |
+| Swagger / OpenAPI | Complete |
+| Error Handling | Complete |
+| Firebase Firestore | Complete |
+| API Testing Screenshots | Complete |
+
+---
+
+## Conclusion
+
+This project implements a complete Event Management and Ticketing API with authentication, authorization, event management, ticket booking, Firestore transactions, rate limiting, validation, error handling, and Swagger documentation.
+
+The use of Firestore atomic transactions ensures reliable ticket inventory management and prevents ticket overselling during concurrent bookings.
+
+All API testing screenshots are included in the docs folder.
