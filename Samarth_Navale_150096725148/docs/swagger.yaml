@@ -1,0 +1,141 @@
+openapi: 3.0.0
+info:
+  title: Event Management & Ticketing API
+  version: 1.0.0
+  description: Event Management & Live Ticketing REST API with Firestore, RBAC and Rate Limiting
+paths:
+  /api/auth/register:
+    post:
+      summary: Register as Attendee or Organizer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum: [Attendee, Organizer]
+      responses:
+        201:
+          description: User registered successfully
+  /api/auth/login:
+    post:
+      summary: Authenticate user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login successful
+  /api/auth/profile:
+    get:
+      summary: Get user profile
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: User profile
+  /api/events:
+    get:
+      summary: Get all events
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: city
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of events
+    post:
+      summary: Create new event (Organizer)
+      security:
+        - bearerAuth: []
+      responses:
+        201:
+          description: Event created
+  /api/events/{id}:
+    get:
+      summary: Get event details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Event details
+    put:
+      summary: Update event (Organizer)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Event updated
+    delete:
+      summary: Delete event (Organizer)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Event deleted
+  /api/events/{id}/attendees:
+    get:
+      summary: List registered attendees for event (Organizer)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Attendees list
+  /api/tickets/book:
+    post:
+      summary: Book tickets with rate limit and atomic decrement (Attendee)
+      security:
+        - bearerAuth: []
+      responses:
+        201:
+          description: Tickets booked
+        429:
+          description: Too many requests
+  /api/tickets/my-tickets:
+    get:
+      summary: View my purchased tickets (Attendee)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: My tickets
+  /api/tickets/{id}/cancel:
+    post:
+      summary: Cancel ticket & restore inventory (Attendee)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Ticket cancelled
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

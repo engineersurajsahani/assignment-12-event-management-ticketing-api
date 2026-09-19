@@ -1,0 +1,111 @@
+{
+  "info": {
+    "name": "Event Management & Ticketing API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Organizer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tech Events Inc\",\n  \"email\": \"organizer@tech.com\",\n  \"password\": \"password123\",\n  \"role\": \"Organizer\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/auth/register", "host": ["{{base_url}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Register Attendee",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kunal Sharma\",\n  \"email\": \"kunal@gmail.com\",\n  \"password\": \"password123\",\n  \"role\": \"Attendee\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/auth/register", "host": ["{{base_url}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kunal@gmail.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Get Events",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/events?category=Technology&city=Mumbai", "host": ["{{base_url}}"], "path": ["api", "events"], "query": [{ "key": "category", "value": "Technology" }, { "key": "city", "value": "Mumbai" }] }
+          }
+        },
+        {
+          "name": "Get Event By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/events/event_techconf_2026", "host": ["{{base_url}}"], "path": ["api", "events", "event_techconf_2026"] }
+          }
+        },
+        {
+          "name": "Create Event (Organizer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{organizer_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"DevOps Summit 2026\",\n  \"description\": \"Cloud and CI/CD deep dive\",\n  \"category\": \"Technology\",\n  \"eventDate\": \"2026-08-10T10:00:00Z\",\n  \"venue\": \"NESCO, Mumbai\",\n  \"ticketPrice\": 1999,\n  \"totalCapacity\": 300\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/events", "host": ["{{base_url}}"], "path": ["api", "events"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "Book Ticket (Attendee)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{attendee_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"event_techconf_2026\",\n  \"quantity\": 2,\n  \"attendeeName\": \"Kunal Sharma\",\n  \"attendeeEmail\": \"kunal@gmail.com\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/tickets/book", "host": ["{{base_url}}"], "path": ["api", "tickets", "book"] }
+          }
+        },
+        {
+          "name": "Get My Tickets",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{attendee_token}}" }],
+            "url": { "raw": "{{base_url}}/api/tickets/my-tickets", "host": ["{{base_url}}"], "path": ["api", "tickets", "my-tickets"] }
+          }
+        }
+      ]
+    }
+  ]
+}
