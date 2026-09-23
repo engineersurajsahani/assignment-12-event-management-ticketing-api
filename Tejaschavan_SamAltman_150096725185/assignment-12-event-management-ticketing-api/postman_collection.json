@@ -1,0 +1,437 @@
+{
+  "info": {
+    "_postman_id": "8f3b2a19-4d9e-4a6c-9c71-event-ticketing-api",
+    "name": "Event Management & Ticketing API",
+    "description": "Comprehensive Postman collection for Event Management & Ticketing API with JWT Authentication, Firestore RBAC, Ticket Booking Transactions, and Rate Limiting tests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5050",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "organizer_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "attendee_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ticketId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Register Organizer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tech Conferences Org\",\n  \"email\": \"organizer@techconf.org\",\n  \"password\": \"organizerPass123\",\n  \"role\": \"organizer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Registers a new user with organizer role."
+          }
+        },
+        {
+          "name": "Register Attendee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice Attendee\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"attendeePass123\",\n  \"role\": \"attendee\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Registers a new user with attendee role (default)."
+          }
+        },
+        {
+          "name": "Login as Organizer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('organizer_token', jsonData.token);",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.token);",
+                  "    console.log('Organizer token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"organizer@techconf.org\",\n  \"password\": \"organizerPass123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Logs in the organizer and automatically stores the JWT token into collection variables."
+          }
+        },
+        {
+          "name": "Login as Attendee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('attendee_token', jsonData.token);",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.token);",
+                  "    console.log('Attendee token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"attendeePass123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Logs in the attendee and stores the JWT token in collection variables."
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Retrieves the authenticated user profile using the Bearer JWT token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Events",
+      "item": [
+        {
+          "name": "Get Upcoming Events (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/events?category=Technology&city=Mumbai",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Technology"
+                },
+                {
+                  "key": "city",
+                  "value": "Mumbai"
+                }
+              ]
+            },
+            "description": "Retrieves upcoming events filtered by category and city (venue substring matching)."
+          }
+        },
+        {
+          "name": "Get Event By ID (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/events/{{eventId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events", "{{eventId}}"]
+            },
+            "description": "Fetches a single event with live real-time availableTickets count."
+          }
+        },
+        {
+          "name": "Create Event (Organizer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set('eventId', jsonData.data.id);",
+                  "    console.log('Event ID saved: ' + jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizer_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Cloud & AI Summit 2026\",\n  \"description\": \"Annual technology conference focusing on Cloud, Kubernetes, and Agentic AI workflows.\",\n  \"category\": \"Technology\",\n  \"eventDate\": \"2026-11-20T09:00:00.000Z\",\n  \"venue\": \"Grand Convention Center, Bandra Kurla Complex, Mumbai\",\n  \"ticketPrice\": 149.99,\n  \"totalCapacity\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"]
+            },
+            "description": "Creates a new event (Organizer only). Sets availableTickets equal to totalCapacity."
+          }
+        },
+        {
+          "name": "Update Event (Organizer)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizer_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Cloud & AI Summit 2026 - Keynote Edition\",\n  \"totalCapacity\": 10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events/{{eventId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events", "{{eventId}}"]
+            },
+            "description": "Updates event details and adjusts availableTickets based on totalCapacity delta (Organizer owner only)."
+          }
+        },
+        {
+          "name": "Get Event Attendees (Organizer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/events/{{eventId}}/attendees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events", "{{eventId}}", "attendees"]
+            },
+            "description": "Fetches confirmed attendees list for the event (Organizer owner only)."
+          }
+        },
+        {
+          "name": "Delete Event (Organizer)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/events/{{eventId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events", "{{eventId}}"]
+            },
+            "description": "Cancels all associated tickets in a batch and deletes the event doc (Organizer owner only)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Tickets",
+      "item": [
+        {
+          "name": "Book Tickets (Attendee)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set('ticketId', jsonData.data.id);",
+                  "    console.log('Ticket ID saved: ' + jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{attendee_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"{{eventId}}\",\n  \"quantity\": 2,\n  \"attendeeName\": \"Alice Attendee\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/book",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "book"]
+            },
+            "description": "Books tickets using an atomic Firestore transaction to prevent overselling. (Attendee only, rate limited to 10 req/min)."
+          }
+        },
+        {
+          "name": "Book Tickets - Rate Limit Test (Run in Collection Runner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{attendee_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"{{eventId}}\",\n  \"quantity\": 1,\n  \"attendeeName\": \"Spam Tester\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/book",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "book"]
+            },
+            "description": "RATE LIMIT TEST: Run this request in Postman Collection Runner with 15 iterations and 0ms delay. The first 10 requests will be processed (or hit capacity), and requests 11 to 15 will return HTTP 429 Too Many Requests ('Too many booking attempts, please try again later.')."
+          }
+        },
+        {
+          "name": "Get My Tickets (Attendee)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{attendee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/my-tickets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "my-tickets"]
+            },
+            "description": "Retrieves booking history for the authenticated attendee."
+          }
+        },
+        {
+          "name": "Cancel Ticket (Attendee)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{attendee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/{{ticketId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "{{ticketId}}", "cancel"]
+            },
+            "description": "Cancels a booked ticket and atomically restores the event capacity in Firestore."
+          }
+        }
+      ]
+    }
+  ]
+}
