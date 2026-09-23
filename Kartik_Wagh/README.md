@@ -233,16 +233,8 @@ In Render Settings -> **Environment Variables**:
 > 💡 **Tip for Firebase JSON**: If pasting raw JSON causes parsing issues in Render's UI, base64-encode your key locally with `base64 -i serviceAccountKey.json` and paste the resulting string into `FIREBASE_SERVICE_ACCOUNT_JSON`. `config/firebaseConfig.js` automatically decodes it.
 
 ---
-
-## 📸 Screenshots & Documentation
-
-Place your screenshots in the `/docs` directory:
-- `docs/swagger_ui.png` (Live Swagger UI console)
-- `docs/firestore_events.png` (Firestore events collection)
-- `docs/firestore_tickets.png` (Firestore tickets collection)
-- `docs/concurrency_test.png` (Terminal output of `node test_concurrency.js`)
-
----
+DEPLOYMENT LINK : 
+https://assignment-12-event-management-ticketing-7w58.onrender.com/
 
 ## 👨‍💻 Author
 
