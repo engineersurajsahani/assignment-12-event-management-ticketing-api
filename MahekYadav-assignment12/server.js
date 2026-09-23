@@ -1,0 +1,10 @@
+require("dotenv").config();
+const express=require("express"),cors=require("cors"),swaggerUi=require("swagger-ui-express");
+const authRoutes=require("./routes/authRoutes"),eventRoutes=require("./routes/eventRoutes"),ticketRoutes=require("./routes/ticketRoutes"),swagger=require("./config/swagger");
+const app=express(),PORT=process.env.PORT||5000;
+app.use(cors());app.use(express.json());
+app.get("/",(req,res)=>res.json({success:true,message:"Assignment 12 Event Management & Ticketing API",documentation:"/api-docs"}));
+app.use("/api/auth",authRoutes);app.use("/api/events",eventRoutes);app.use("/api/tickets",ticketRoutes);app.use("/api-docs",swaggerUi.serve,swaggerUi.setup(swagger));
+app.use((req,res)=>res.status(404).json({success:false,message:"Route not found."}));
+app.use((err,req,res,next)=>{console.error(err);res.status(500).json({success:false,message:"Internal server error."})});
+app.listen(PORT,()=>console.log(`API running at http://localhost:${PORT} | Swagger: http://localhost:${PORT}/api-docs`));
